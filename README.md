@@ -31,3 +31,10 @@ This library implements that formula and nothing else. The trade-off is simplici
 Longitude is **decimal degrees, east-positive** (west is negative). The return is **decimal hours**. Mixing these up is the single most common mistake: 15 degrees equals one hour, so a sign error or a units swap produces a silently wrong answer that still looks plausible. The functions accept only these units; there is no flag to switch to radians or H/M/S.
 
 The datetime passed in must be **timezone-aware**. Naive datetimes are rejected with `ValueError`, because a wall-clock time with no zone is ambiguous and a wrong guess is invisible. The library coerces non-UTC zones to UTC internally, so passing `+02:00` is fine and equivalent to passing the corresponding UTC instant.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
